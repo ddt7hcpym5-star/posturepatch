@@ -1,1 +1,511 @@
-# posturepatch
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PosturePatch</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+    background: #0a0a0a;
+    color: #ffffff;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .header {
+    width: 100%;
+    padding: 20px 24px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .logo { font-size: 20px; font-weight: 600; color: #1D9E75; }
+  .mode-pill {
+    background: #1a2e25;
+    color: #1D9E75;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+  }
+
+  .connect-screen {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 24px;
+    gap: 20px;
+  }
+
+  .connect-btn {
+    background: #1D9E75;
+    color: white;
+    border: none;
+    padding: 16px 40px;
+    border-radius: 14px;
+    font-size: 17px;
+    font-weight: 600;
+    cursor: pointer;
+    width: 100%;
+    max-width: 320px;
+  }
+
+  .connect-btn:disabled {
+    background: #0f4a35;
+    color: #1D9E75;
+  }
+
+  .status-text {
+    color: #666;
+    font-size: 14px;
+    text-align: center;
+  }
+
+  .dashboard {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    padding: 16px 24px;
+    gap: 16px;
+  }
+
+  .ring-container {
+    position: relative;
+    width: 220px;
+    height: 220px;
+    margin: 10px 0;
+  }
+
+  .ring-container svg {
+    transform: rotate(-90deg);
+  }
+
+  .ring-label {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+  }
+
+  .score-number {
+    font-size: 56px;
+    font-weight: 700;
+    color: #1D9E75;
+    line-height: 1;
+  }
+
+  .score-sub {
+    font-size: 13px;
+    color: #666;
+    margin-top: 4px;
+  }
+
+  .status-badge {
+    padding: 10px 24px;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 600;
+    width: 100%;
+    text-align: center;
+  }
+
+  .good { background: #1a2e25; color: #1D9E75; }
+  .okay { background: #2a2a1a; color: #E5A000; }
+  .bad { background: #2e1a1a; color: #E05050; }
+
+  .stats-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px;
+    width: 100%;
+  }
+
+  .stat-card {
+    background: #161616;
+    border-radius: 12px;
+    padding: 14px 10px;
+    text-align: center;
+  }
+
+  .stat-number {
+    font-size: 22px;
+    font-weight: 600;
+    color: #ffffff;
+  }
+
+  .stat-label {
+    font-size: 11px;
+    color: #666;
+    margin-top: 4px;
+  }
+
+  .streak-section {
+    width: 100%;
+    background: #161616;
+    border-radius: 14px;
+    padding: 16px;
+  }
+
+  .streak-title {
+    font-size: 13px;
+    color: #666;
+    margin-bottom: 10px;
+  }
+
+  .streak-dots {
+    display: flex;
+    gap: 8px;
+    justify-content: space-between;
+  }
+
+  .streak-dot {
+    flex: 1;
+    aspect-ratio: 1;
+    border-radius: 8px;
+    background: #1a2e25;
+    border: 1.5px solid #1D9E75;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    color: #1D9E75;
+    font-weight: 600;
+  }
+
+  .streak-dot.filled {
+    background: #1D9E75;
+    color: #0a0a0a;
+  }
+
+  .tip-card {
+    width: 100%;
+    background: #161616;
+    border-radius: 14px;
+    padding: 14px 16px;
+    border-left: 3px solid #1D9E75;
+  }
+
+  .tip-text {
+    font-size: 13px;
+    color: #aaa;
+    line-height: 1.5;
+  }
+
+  .onboarding {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 24px;
+    gap: 16px;
+    width: 100%;
+  }
+
+  .onboarding h2 {
+    font-size: 22px;
+    font-weight: 600;
+    text-align: center;
+  }
+
+  .onboarding p {
+    font-size: 14px;
+    color: #666;
+    text-align: center;
+  }
+
+  .mode-option {
+    width: 100%;
+    max-width: 340px;
+    background: #161616;
+    border: 1.5px solid #333;
+    border-radius: 14px;
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    cursor: pointer;
+  }
+
+  .mode-option.selected {
+    border-color: #1D9E75;
+    background: #1a2e25;
+  }
+
+  .mode-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 10px;
+    background: #1D9E75;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+
+  .mode-title { font-size: 15px; font-weight: 600; }
+  .mode-desc { font-size: 12px; color: #666; margin-top: 2px; }
+
+  .start-btn {
+    background: #1D9E75;
+    color: white;
+    border: none;
+    padding: 16px;
+    border-radius: 14px;
+    font-size: 17px;
+    font-weight: 600;
+    cursor: pointer;
+    width: 100%;
+    max-width: 340px;
+    margin-top: 8px;
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <span class="logo">PosturePatch</span>
+  <span class="mode-pill" id="modePill">Not connected</span>
+</div>
+
+<!-- Connect Screen -->
+<div class="connect-screen" id="connectScreen">
+  <div style="font-size: 60px;">🩹</div>
+  <h2 style="font-size: 24px; font-weight: 700; text-align: center;">Connect your patch</h2>
+  <p class="status-text">Make sure your PosturePatch device is powered on and nearby</p>
+  <button class="connect-btn" id="connectBtn" onclick="connectBluetooth()">Connect PosturePatch</button>
+  <p class="status-text" id="connectStatus">Ready to connect</p>
+</div>
+
+<!-- Onboarding Screen -->
+<div class="onboarding" id="onboardingScreen" style="display:none;">
+  <h2>How will you use it?</h2>
+  <p>We'll adjust the sensitivity based on your activity</p>
+
+  <div class="mode-option selected" id="modeGym" onclick="selectMode('gym', this)">
+    <div class="mode-icon">🏋️</div>
+    <div>
+      <div class="mode-title">Gym mode</div>
+      <div class="mode-desc">Form checks during lifts</div>
+    </div>
+  </div>
+
+  <div class="mode-option" id="modeDesk" onclick="selectMode('desk', this)">
+    <div class="mode-icon">💻</div>
+    <div>
+      <div class="mode-title">Gaming / study</div>
+      <div class="mode-desc">Desk posture all day</div>
+    </div>
+  </div>
+
+  <div class="mode-option" id="modeLife" onclick="selectMode('life', this)">
+    <div class="mode-icon">🚶</div>
+    <div>
+      <div class="mode-title">Everyday life</div>
+      <div class="mode-desc">Walking, commuting, standing</div>
+    </div>
+  </div>
+
+  <button class="start-btn" onclick="startDashboard()">Let's go</button>
+</div>
+
+<!-- Dashboard -->
+<div class="dashboard" id="dashboard">
+
+  <div class="ring-container">
+    <svg width="220" height="220" viewBox="0 0 220 220">
+      <circle cx="110" cy="110" r="95" fill="none" stroke="#1a1a1a" stroke-width="16"/>
+      <circle id="ringCircle" cx="110" cy="110" r="95" fill="none" stroke="#1D9E75"
+        stroke-width="16" stroke-linecap="round"
+        stroke-dasharray="597" stroke-dashoffset="597"/>
+    </svg>
+    <div class="ring-label">
+      <div class="score-number" id="scoreDisplay">--</div>
+      <div class="score-sub">posture score</div>
+    </div>
+  </div>
+
+  <div class="status-badge good" id="statusBadge">Waiting for data...</div>
+
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-number" id="goodMinutes">0</div>
+      <div class="stat-label">min good posture</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number" id="alertCount">0</div>
+      <div class="stat-label">slouch alerts</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number" id="avgScore">--</div>
+      <div class="stat-label">avg score</div>
+    </div>
+  </div>
+
+  <div class="streak-section">
+    <div class="streak-title">7 day streak</div>
+    <div class="streak-dots" id="streakDots"></div>
+  </div>
+
+  <div class="tip-card">
+    <div class="tip-text" id="tipText">Connect your patch to start tracking your posture.</div>
+  </div>
+
+</div>
+
+<script>
+  const SERVICE_UUID = '4fafc201-1fb5-459e-8fcc-c5c9c331914b';
+  const CHARACTERISTIC_UUID = 'beb5483e-36e1-4688-b7f5-ea07361b26a8';
+
+  let selectedMode = 'gym';
+  let goodSeconds = 0;
+  let alertCount = 0;
+  let scoreHistory = [];
+  let lastScore = 100;
+  let characteristic = null;
+
+  const tips = {
+    gym: [
+      "Brace your core before every lift",
+      "Retract your scapula on pulling movements",
+      "Keep your chest up during squats",
+      "Neutral spine on deadlifts — hinge, don't round"
+    ],
+    desk: [
+      "Screen should be at eye level",
+      "Feet flat on the floor, hips at 90 degrees",
+      "Take a posture break every 30 minutes",
+      "Shoulders back and down, not hunched forward"
+    ],
+    life: [
+      "Imagine a string pulling the crown of your head upward",
+      "Keep your phone at eye level when scrolling",
+      "Engage your core slightly when walking",
+      "Roll your shoulders back every hour"
+    ]
+  };
+
+  function selectMode(mode, el) {
+    selectedMode = mode;
+    document.querySelectorAll('.mode-option').forEach(o => o.classList.remove('selected'));
+    el.classList.add('selected');
+  }
+
+  function startDashboard() {
+    document.getElementById('onboardingScreen').style.display = 'none';
+    document.getElementById('dashboard').style.display = 'flex';
+    const modeNames = { gym: 'Gym mode', desk: 'Gaming / study', life: 'Everyday life' };
+    document.getElementById('modePill').textContent = modeNames[selectedMode];
+    buildStreakDots();
+    rotateTip();
+    setInterval(rotateTip, 15000);
+    setInterval(updateStats, 1000);
+  }
+
+  function buildStreakDots() {
+    const days = ['M','T','W','T','F','S','S'];
+    const today = new Date().getDay();
+    const adjusted = today === 0 ? 6 : today - 1;
+    let html = '';
+    days.forEach((d, i) => {
+      const filled = i <= adjusted ? 'filled' : '';
+      html += `<div class="streak-dot ${filled}">${d}</div>`;
+    });
+    document.getElementById('streakDots').innerHTML = html;
+  }
+
+  function rotateTip() {
+    const modeTips = tips[selectedMode];
+    const tip = modeTips[Math.floor(Math.random() * modeTips.length)];
+    document.getElementById('tipText').textContent = tip;
+  }
+
+  function updateStats() {
+    if (lastScore >= 70) goodSeconds++;
+    document.getElementById('goodMinutes').textContent = Math.floor(goodSeconds / 60);
+    if (scoreHistory.length > 0) {
+      const avg = Math.round(scoreHistory.reduce((a,b) => a+b, 0) / scoreHistory.length);
+      document.getElementById('avgScore').textContent = avg;
+    }
+  }
+
+  function updateScore(score) {
+    lastScore = score;
+    scoreHistory.push(score);
+    if (scoreHistory.length > 120) scoreHistory.shift();
+
+    document.getElementById('scoreDisplay').textContent = score;
+
+    const circumference = 597;
+    const offset = circumference - (score / 100) * circumference;
+    document.getElementById('ringCircle').style.strokeDashoffset = offset;
+
+    const badge = document.getElementById('statusBadge');
+    const ring = document.getElementById('ringCircle');
+
+    if (score >= 70) {
+      badge.textContent = '✓ Good posture — keep it up';
+      badge.className = 'status-badge good';
+      ring.setAttribute('stroke', '#1D9E75');
+    } else if (score >= 40) {
+      badge.textContent = '~ Could be better — adjust slightly';
+      badge.className = 'status-badge okay';
+      ring.setAttribute('stroke', '#E5A000');
+    } else {
+      badge.textContent = '✗ Slouching — sit up now';
+      badge.className = 'status-badge bad';
+      ring.setAttribute('stroke', '#E05050');
+      alertCount++;
+      document.getElementById('alertCount').textContent = alertCount;
+    }
+  }
+
+  async function connectBluetooth() {
+    const btn = document.getElementById('connectBtn');
+    const status = document.getElementById('connectStatus');
+
+    try {
+      btn.disabled = true;
+      status.textContent = 'Searching for PosturePatch...';
+
+      const device = await navigator.bluetooth.requestDevice({
+        filters: [{ name: 'PosturePatch' }],
+        optionalServices: [SERVICE_UUID]
+      });
+
+      status.textContent = 'Connecting...';
+      const server = await device.gatt.connect();
+      const service = await server.getPrimaryService(SERVICE_UUID);
+      characteristic = await service.getCharacteristic(CHARACTERISTIC_UUID);
+
+      await characteristic.startNotifications();
+      characteristic.addEventListener('characteristicvaluechanged', (event) => {
+        const value = new TextDecoder().decode(event.target.value);
+        const score = parseInt(value);
+        if (!isNaN(score)) updateScore(score);
+      });
+
+      status.textContent = 'Connected!';
+      document.getElementById('connectScreen').style.display = 'none';
+      document.getElementById('onboardingScreen').style.display = 'flex';
+      document.getElementById('modePill').textContent = 'Connected';
+
+    } catch(err) {
+      status.textContent = 'Connection failed — try again';
+      btn.disabled = false;
+      console.error(err);
+    }
+  }
+</script>
+</body>
+</html>
