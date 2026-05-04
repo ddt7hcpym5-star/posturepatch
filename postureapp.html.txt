@@ -439,10 +439,15 @@
     }
   }
 
-  function updateScore(score) {
-    lastScore = score;
-    scoreHistory.push(score);
+  function updateScore(rawScore) {
+    // Rolling average of last 5 readings to smooth jitter
+    scoreHistory.push(rawScore);
     if (scoreHistory.length > 120) scoreHistory.shift();
+    
+    // Smooth score — average of last 5 readings
+    const recent = scoreHistory.slice(-5);
+    const score = Math.round(recent.reduce((a,b) => a+b, 0) / recent.length);
+    lastScore = score;
 
     document.getElementById('scoreDisplay').textContent = score;
 
