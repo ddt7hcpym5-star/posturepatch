@@ -446,7 +446,8 @@
     
     // Smooth score — average of last 5 readings
     const recent = scoreHistory.slice(-5);
-    const score = Math.round(recent.reduce((a,b) => a+b, 0) / recent.length);
+    const raw = Math.round(recent.reduce((a,b) => a+b, 0) / recent.length);
+    const score = Math.min(100, Math.max(0, raw));
     lastScore = score;
 
     document.getElementById('scoreDisplay').textContent = score;
@@ -462,7 +463,8 @@
       badge.textContent = '✓ Good posture — keep it up';
       badge.className = 'status-badge good';
       ring.setAttribute('stroke', '#1D9E75');
-    } else if (score >= 40) {
+      window.slouchStart = null;
+      } else if (score >= 40) {
       badge.textContent = '~ Could be better — adjust slightly';
       badge.className = 'status-badge okay';
       ring.setAttribute('stroke', '#E5A000');
@@ -470,10 +472,16 @@
       badge.textContent = '✗ Slouching — sit up now';
       badge.className = 'status-badge bad';
       ring.setAttribute('stroke', '#E05050');
-      alertCount++;
-      document.getElementById('alertCount').textContent = alertCount;
+      
+      // Only count alert after 10 seconds of continuous slouching
+      if (!window.slouchStart) {
+        window.slouchStart = Date.now();
+      } else if (Date.now() - window.slouchStart > 10000) {
+        alertCount++;
+        document.getElementById('alertCount').textContent = alertCount;
+        window.slouchStart = null;
+      }
     }
-  }
 
   async function connectBluetooth() {
     const btn = document.getElementById('connectBtn');
